@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'tempfile'
+
+msg = `git log -l HEAD`
+
+msgs = msg.split("\n")
+
+puts msgs.first
+
+regex = /^commit\s(?<commit_id>[0-9a-fA-F]+)\s*$/
+
+result = regex.match(msgs.first)
+
+#puts result[:commit_id]
+
+commit_msgs = msgs.first( 1 + msgs.rotate.index { |line| regex.match(line) } ).join("\n")
+
+ticket_regex = /\[(?<ticket_id>[0-9a-fA-F]+\s*(\,\s*[0-9a-fA-F]+\s*)*)\]/
+
+if m = ticket_regex.match(commit_msgs)
+    branch = `git branch | grep "*"`.split(" ")[1]
+    ticket_ids = m["ticket_id"].split(',')
+    ticket_ids.each do |id|
+        tmp = Tempfile.new("ticmsg")
+        tmp.write( "branch: #{branch}  " )
+        tmp.write( "#{commit_msgs}" )
+        tmp.close
+        ti_cmd = "ti comment #{id} -f #{tmp.path}"
+        #puts ti_cmd
+        system( ti_cmd )
+    end
+end
