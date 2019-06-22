@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+#
+
+require 'pathname'
+
+
+if !File.exists? ".git"
+    puts "Repo not founded!"
+    exit
+end
+
+hook_file =  Pathname.new( File.dirname( File.realpath(__FILE__) ) + "/../git-hooks/post-commit.ticgit" ).cleanpath
+
+Pathname.new( ".git/hooks/post-commit" ).make_symlink( hook_file )
+

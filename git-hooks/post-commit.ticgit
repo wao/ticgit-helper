@@ -6,7 +6,7 @@ msg = `git log -l HEAD`
 
 msgs = msg.split("\n")
 
-puts msgs.first
+# puts msgs.first
 
 regex = /^commit\s(?<commit_id>[0-9a-fA-F]+)\s*$/
 
@@ -25,9 +25,12 @@ if m = ticket_regex.match(commit_msgs)
         tmp = Tempfile.new("ticmsg")
         tmp.write( "branch: #{branch}  " )
         tmp.write( "#{commit_msgs}" )
+        tmp.flush
+        ti_cmd = "execat .git ti comment #{id} -f #{tmp.path}"
+        # puts ti_cmd
+        if !system( ti_cmd )
+            puts "Error in update tic comment: [#{ti_cmd}]"
+        end
         tmp.close
-        ti_cmd = "ti comment #{id} -f #{tmp.path}"
-        #puts ti_cmd
-        system( ti_cmd )
     end
 end
