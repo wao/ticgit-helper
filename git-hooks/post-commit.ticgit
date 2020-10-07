@@ -2,7 +2,7 @@
 
 require 'tempfile'
 
-msg = `git log -l HEAD`
+msg = `git log -1`
 
 msgs = msg.split("\n")
 
